@@ -27,7 +27,10 @@ const thresholdSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Project'
         },
-        
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
     },
     {
         timestamps: true

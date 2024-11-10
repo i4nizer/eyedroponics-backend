@@ -11,7 +11,10 @@ const sensorSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Device'
         },
-        
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
     },
     {
         timestamps: true

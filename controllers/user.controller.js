@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const userModel = require('../models/user.model')
+const preferenceModel = require('../models/preference.model')
 const { accessKey, refreshKey, tokenLife } = require('../config/config')
 
 
@@ -8,83 +9,88 @@ const userController = {
 
     postSignUp: async (req, res) => {
         try {
+            // access and hash
+            const { name, email, password } = req.body
+            const hashedPsk = crypto.createHash('sha256').update(password).digest('hex')
+            
             // create user
-            req.user.role = 'User'
-            req.user.password = crypto.createHash('sha256').update(req.user.password).digest('hex')
-            const user = new userModel(req.user)
+            const userDoc = { name, email, password: hashedPsk, role: req?.role || 'User' }
+            const user = new userModel(userDoc)
             await user.save()
             
             // create preference with userId
+            const prefDoc = { emailAlerts: req.body?.emailAlerts || true, userId: user._id }
+            const pref = new preferenceModel(prefDoc)
+            await pref.save()
 
             // send user without password
-            const data = {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                verified: user.verified,
-                role: user.role,
-            }
+            delete userDoc.password
+            userDoc._id = user._id
+            userDoc.emailAlerts = prefDoc.emailAlerts
 
-            res.send({ txt: `User account created successfully`, obj: { ...data } })
+            res.send({ txt: `User account created successfully`, obj: userDoc })
 
         } catch (error) { res.status(500).send(error.toString()) }
     },
 
     postSignIn: async (req, res) => {
         try {
-            // find user
-            req.user.password = crypto.createHash('sha256').update(req.user.password).digest('hex')
-            const filter = { name: req.user.name, password: req.user.password }
-            const user = await userModel.findOne(filter)
+            // access and hash
+            const { name, password } = req.body
+            const hashedPsk = crypto.createHash('sha256').update(password).digest('hex')
+
+            // check db
+            const user = await userModel.findOne({ name, password: hashedPsk })
             if (!user) return res.status(404).send('Incorrect name or password')
 
             // create tokens
-            const payload = { _id: user._id, verified: user.verified, role: user.role }
+            const payload = { userId: user._id, verified: user.verified, role: user.role }
             const access = jwt.sign(payload, accessKey, { expiresIn: tokenLife })
-            const refresh = jwt.sign(payload, refreshKey, { expiresIn: '7d' })
+            const refresh = jwt.sign(payload, refreshKey, { expiresIn: '1d' })
 
-            // save token
+            // save refresh token in db
             user.token = refresh
             await user.save()
             
             // send user and tokens
-            const data = {
+            const userDoc = {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
                 verified: user.verified,
                 role: user.role,
+                access, refresh
             }
 
-            res.send({ txt: 'User signed-in successfully', obj: { ...data, access, refresh } })
+            res.send({ txt: 'User signed-in successfully', obj: userDoc })
             
         } catch (error) { res.status(500).send(error.toString()) }
     },
 
-    postToken: async (req, res) => {
+    postRefreshToken: async (req, res) => {
         try {
-            // validate token
-            const token = req.body?.token
-            if (!token) return res.status(400).send('Refresh token required')
-            jwt.verify(token, refreshKey)
+            // access
+            const userId = req.params.userId
+            const token = req.body.token
 
-            // find user with token
-            const user = await userModel.findOne({ token })
-            if (!user) return res.status(404).send('Invalid token')
+            // check in jwt and db
+            jwt.verify(token, refreshKey)
+            const user = await userModel.findOne({ _id: userId, token })
+            if (!user) return res.status(404).send('Token not found or invalid')
             
             // issue new token
-            const payload = { _id: user._id, verified: user.verified, role: user.role }
+            const payload = { userId: user._id, verified: user.verified, role: user.role }
             const access = jwt.sign(payload, accessKey, { expiresIn: tokenLife })
-            const refresh = jwt.sign(payload, refreshKey, { expiresIn: '7d' })
+            const refresh = jwt.sign(payload, refreshKey, { expiresIn: '1d' })
 
-            // save token
+            // save refresh token in db
             user.token = refresh
             await user.save()
 
             res.send({ txt: 'New tokens issued', obj: { access, refresh } })
             
         } catch (error) { res.status(500).send(error.toString()) }
-    }
+    },
 
 }
 

@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
-const apiKeyModel = require('../models/apikey.model')
 
 
 const authMiddleware = {
@@ -15,14 +14,13 @@ const authMiddleware = {
 
         return (req, res, next) => {
             try {
-                // get token payload {userId, verified, role}
+                // get token payload { userId, verified, role}
                 const token = req.headers['authorization']?.split(' ')[1]
                 if (!token) return res.status(401).send('Access token is required')
                 const payload = jwt.verify(token, config.jwtSecret)
                 
                 // check verified   
-                const verified = payload?.verified
-                if (!verified) return res.status(403).send(`User is not yet verified`)
+                if (!payload?.verified) return res.status(403).send(`User is not yet verified`)
 
                 // check role
                 const role = payload?.role
@@ -41,11 +39,11 @@ const authMiddleware = {
             const key = req.headers['x-api-key']
             if (!key) return res.status(401).send('API key is missing')
             
-            const apiKey = await apiKeyModel.findOne({ key, isRevoked: false })
+            // const apiKey = await apiKeyModel.findOne({ key, isRevoked: false })
             if (!apiKey) return res.status(403).send('Invalid API key')
 
             next()
-        } catch (error) { res.status(401).send('Invalid revoked API key') }
+        } catch (error) { res.status(401).send('Invalid or revoked API key') }
     },
 
 }

@@ -9,11 +9,15 @@ const deviceSchema = new mongoose.Schema(
         },
         key: {
             type: String,
-            required: true,
+            default: '',
         },
         projectId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Project'
+        },
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
         },
     },
     {
