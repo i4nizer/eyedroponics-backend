@@ -1,4 +1,5 @@
 const projectModel = require('../models/project.model')
+const thresholdModel = require('../models/threshold.model')
 
 
 const projectController = {
@@ -34,7 +35,11 @@ const projectController = {
             const project = new projectModel({ name, userId })
             await project.save()
 
-            res.send({ txt: 'New project created', obj: project })
+            // create threshold for the project
+            const threshold = new thresholdModel({ projectId: project._id, userId })
+            await threshold.save()
+
+            res.send({ txt: 'New project created', obj: { project, threshold } })
 
         } catch (error) { res.status(500).send(error.toString()) }
     },
@@ -60,6 +65,9 @@ const projectController = {
             
             const project = await projectModel.findOneAndDelete({ _id: projectId, userId })
             if (!project) return res.status(404).send('Project not found')
+            
+            // delete threshold too
+            await thresholdModel.deleteMany({ projectId, userId })
             
             res.send({ txt: 'Project deleted' })
             

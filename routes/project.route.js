@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
 
-
 const deviceRoutes = require('./device.route')
 const projectController = require('../controllers/project.controller')
 const projectMiddleware = require('../middlewares/project.middleware')
