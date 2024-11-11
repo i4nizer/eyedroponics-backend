@@ -19,10 +19,6 @@ const thresholdSchema = new mongoose.Schema(
             min: { type: Number, default: 0 },
             max: { type: Number, default: 0 },
         },
-        activated: {
-            type: Boolean,
-            default: false,
-        },
         projectId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Project'

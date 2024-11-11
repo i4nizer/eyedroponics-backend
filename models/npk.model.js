@@ -15,13 +15,9 @@ const npkSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        sensorId: {
+        deviceId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
-        },
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'Device'
         },
     },
     {

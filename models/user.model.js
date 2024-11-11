@@ -29,9 +29,9 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
-        activated: {
+        disabled: {
             type: Boolean,
-            default: true,
+            default: false,
         },
     },
     {

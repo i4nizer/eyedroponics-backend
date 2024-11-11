@@ -35,7 +35,6 @@ const thresholdMiddleware = {
             { name: 'phosphorus', required: false },
             { name: 'potassium', required: false },
             { name: 'ph', required: false },
-            { name: 'activated', required: false },
         ]
         const { error } = validate(fields, body)
         if (error) return res.status(400).send(error)

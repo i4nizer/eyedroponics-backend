@@ -7,6 +7,10 @@ const projectSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        deleted: {
+            type: Boolean,
+            default: false
+        },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'

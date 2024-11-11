@@ -12,9 +12,8 @@ const deviceMiddleware = {
         const { userId } = req.token
         if (!userId) return res.status(401).send('User ID is required')
         
-        const fields = [{ name: 'projectId' }, { name: 'deviceId' }]
-        const { error } = validate(fields, req.params)
-        if (error) return res.status(400).send(error)
+        const { projectId, deviceId } = req.params
+        if (!projectId || !deviceId) return res.status(400).send('Project ID and device ID are required')
         
         next()
     },
@@ -28,7 +27,7 @@ const deviceMiddleware = {
         if (!userId) return res.status(401).send('User ID is required')
         
         const { projectId } = req.params
-        if (!projectId) return res.status(400).send('User ID and project ID are required.')
+        if (!projectId) return res.status(400).send('Project ID is required.')
         
         next()
     },
@@ -45,7 +44,10 @@ const deviceMiddleware = {
         const { projectId } = req.params
         if (!projectId) return res.status(400).send('Project ID is required')
         
-        const fields = [{ name: 'name', min: 1, max: 30 }, { name: 'key', required: false }]
+        const fields = [
+            { name: 'name', min: 1, max: 30 },
+            { name: 'sensors', min: 2, max: 6, required: false },
+        ]
         const { error } = validate(fields, req.body)
         if (error) return res.status(400).send(error)
         
@@ -64,7 +66,10 @@ const deviceMiddleware = {
         const { projectId, deviceId } = req.params
         if (!projectId || !deviceId) return res.status(400).send('Project ID and device ID are required')
         
-        const fields = [{ name: 'name', min: 1, max: 30 }, { name: 'key', required: false }]
+        const fields = [
+            { name: 'name', min: 1, max: 30 },
+            { name: 'sensors', min: 2, max: 6, required: false },
+        ]
         const { error } = validate(fields, req.body)
         if (error) return res.status(400).send(error)
         

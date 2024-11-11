@@ -20,9 +20,9 @@ const thresholdController = {
         try {
             const { userId } = req.token
             const { projectId, thresholdId } = req.params
-            const { nitrogen, phosphorus, potassium, ph, activated } = req.body
+            const { nitrogen, phosphorus, potassium, ph } = req.body
 
-            const thresholdDoc = { nitrogen, phosphorus, potassium, ph, activated }
+            const thresholdDoc = { nitrogen, phosphorus, potassium, ph }
             const threshold = await thresholdModel.findOneAndUpdate({ _id: thresholdId, projectId, userId }, thresholdDoc, { new: true })
             if (!threshold) return res.status(404).send('Threshold not found')
             

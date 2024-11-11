@@ -9,7 +9,7 @@ const projectController = {
             const { userId } = req.token
             const { projectId } = req.params
             
-            const project = await projectModel.find({ _id: projectId, userId })
+            const project = await projectModel.find({ _id: projectId, userId, deleted: false })
             if (!project) return res.status(404).send('Project not found')
             
             res.send({ obj: project })
@@ -21,7 +21,7 @@ const projectController = {
         try {
             const { userId } = req.token
             
-            const projects = await projectModel.find({ userId })
+            const projects = await projectModel.find({ userId, deleted: false })
             res.send({ obj: projects })
             
         } catch (error) { res.status(500).send(error.toString()) }
@@ -29,9 +29,11 @@ const projectController = {
 
     postProject: async (req, res) => {
         try {
+            // access
             const { name } = req.body
             const { userId } = req.token
             
+            // create project
             const project = new projectModel({ name, userId })
             await project.save()
 
@@ -39,7 +41,7 @@ const projectController = {
             const threshold = new thresholdModel({ projectId: project._id, userId })
             await threshold.save()
 
-            res.send({ txt: 'New project created', obj: { project, threshold } })
+            res.send({ txt: 'New project created', obj: project })
 
         } catch (error) { res.status(500).send(error.toString()) }
     },
@@ -50,7 +52,7 @@ const projectController = {
             const { userId } = req.token
             const { projectId } = req.params
             
-            const project = await projectModel.findOneAndUpdate({ _id: projectId, userId }, { name }, { new: true })
+            const project = await projectModel.findOneAndUpdate({ _id: projectId, userId, deleted: false }, { name }, { new: true })
             if (!project) return res.status(404).send('Project not found')
             
             res.send({ txt: 'Project updated', obj: project })
@@ -63,11 +65,8 @@ const projectController = {
             const { userId } = req.token
             const { projectId } = req.params
             
-            const project = await projectModel.findOneAndDelete({ _id: projectId, userId })
+            const project = await projectModel.findOneAndUpdate({ _id: projectId, userId, deleted: false }, { deleted: true }, { new: true })
             if (!project) return res.status(404).send('Project not found')
-            
-            // delete threshold too
-            await thresholdModel.deleteMany({ projectId, userId })
             
             res.send({ txt: 'Project deleted' })
             

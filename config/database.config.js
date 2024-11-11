@@ -3,22 +3,32 @@ const { dbPassword } = require('./config')
 
 
 let retryCount = 0
-const connectionString = `mongodb+srv://i4nizer:${dbPassword}@cluster-project.hnbf8.mongodb.net/eyedroponics?retryWrites=true&w=majority&appName=Cluster-Project`
+let connecting = false
+const connectionString = `mongodb+srv://i4nizer:${dbPassword}@cluster-project.hnbf8.mongodb.net/eyedroponics?retryWrites=true&w=majority&appName=Cluster-Project&tls=true`
 
 const connectDatabase = async () => {
+    retryCount++
+
     try {
         await mongoose.connect(connectionString)
-        console.log(`Database connected successfully after ${retryCount+1} attempts`)
+        console.log(`Database connected successfully after ${retryCount} attempts`)
         retryCount = 0
-
-    } catch (err) {
-        
-        retryCount++
-        console.error(`Database connection failed (${retryCount+1} attempts). Retrying in 5 seconds...`, err)
+    } 
+    catch (err) {
+        console.error(`Database connection failed (${retryCount} attempts). Retrying in 5 seconds...`, err)
+    }
+    finally {
+        connecting = false
     }
 }
 
-mongoose.connection.on('disconnected', () => setTimeout(connectDatabase, 5000))
+const onDisconnected = () => {    
+    if (connecting) return
+    connecting = true
+    setTimeout(connectDatabase, 5000)
+}
+
+mongoose.connection.on('disconnected', onDisconnected)
 mongoose.connection.on('error', (error) => console.error(`${error}`))
 
 

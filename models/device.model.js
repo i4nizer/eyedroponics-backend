@@ -9,7 +9,16 @@ const deviceSchema = new mongoose.Schema(
         },
         key: {
             type: String,
-            default: '',
+            required: true,
+        },
+        sensors: {
+            type: [String],
+            enum: ['NPK', 'pH', 'Camera'],
+            default: [],
+        },
+        deleted: {
+            type: Boolean,
+            default: false
         },
         projectId: {
             type: mongoose.Schema.Types.ObjectId,

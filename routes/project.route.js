@@ -14,8 +14,8 @@ router.route('/:projectId')
     .get(projectMiddleware.validateGetProject, projectController.getProject)
     .patch(projectMiddleware.validatePatchProject, projectController.patchProject)
     .delete(projectMiddleware.validateDeleteProject, projectController.deleteProject)
-
-router.use('/:projectId/device', deviceRoutes)
+    
+router.use('/', deviceRoutes)
 
 
 module.exports = router
