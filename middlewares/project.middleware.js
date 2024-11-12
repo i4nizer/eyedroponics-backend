@@ -28,7 +28,7 @@ const projectMiddleware = {
         const { userId } = req.token
         if (!userId) return res.status(401).send('User ID is required.')
         
-        const fields = [{ name: 'name', max: 30 }]
+        const fields = [{ name: 'name', max: 100 }]
         const { error } = validate(fields, req.body)
         if (error) return res.status(400).send(error)
         
@@ -47,7 +47,7 @@ const projectMiddleware = {
         const { projectId } = req.params
         if (!projectId) return res.status(400).send('Project ID is required.')
         
-        const fields = [ { name: 'name', max: 30 } ]
+        const fields = [ { name: 'name', max: 100 } ]
         const { error } = validate(fields, req.body)
         if (error) return res.status(400).send(error)
     
