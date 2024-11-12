@@ -5,6 +5,7 @@ const projectMiddleware = {
 
     /** Requires projectId in req.params */
     validateGetProject: (req, res, next) => {
+        const { userId } = req.token
         const { projectId } = req.params
         if (!userId || !projectId) return res.status(400).send('User ID and project ID are required.')
         

@@ -36,7 +36,7 @@ const thresholdMiddleware = {
             { name: 'potassium', required: false },
             { name: 'ph', required: false },
         ]
-        const { error } = validate(fields, body)
+        const { error } = validate(fields, req.body)
         if (error) return res.status(400).send(error)
         
         next()

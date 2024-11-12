@@ -8,11 +8,12 @@ const { connectDatabase } = require('./config/database.config')
 
 
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
-app.use('/api', router)
+app.use('/', router)
 
 
 const runServerMsg = `Server running on http://localhost:${config.port}`
 
 connectDatabase()
+    .then(() => console.log('Database Connected Successfully'))
     .then(() => app.listen(config.port, console.log(runServerMsg)))
     .catch((err) => console.log(err))

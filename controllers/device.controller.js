@@ -23,7 +23,10 @@ const deviceController = {
             const { userId } = req.token
             const { projectId } = req.params
 
-            const devices = await deviceModel.find({ userId, projectId, deleted: false })
+            const filter = { userId, deleted: false }
+            if (projectId) filter.projectId = projectId
+
+            const devices = await deviceModel.find(filter)
             res.send({ obj: devices })
 
         } catch (error) { res.status(500).send(error.toString()) }
