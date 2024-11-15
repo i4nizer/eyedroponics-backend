@@ -15,4 +15,4 @@ router.route('/:thresholdId')
     .patch(checkThresholdID, validatePatchThreshold, patchThreshold);
 
 
-module.exports = router;
+module.exports = router

@@ -8,7 +8,7 @@ const thresholdController = {
             const { userId } = req.token
             const { projectId } = req.params
 
-            const threshold = await thresholdModel.findOne({ projectId, userId })
+            const threshold = await thresholdModel.findOne({ projectId, userId, deleted: false })
             if (!threshold) return res.status(404).send('Threshold not found')
             
             res.send({ obj: threshold })
@@ -20,7 +20,7 @@ const thresholdController = {
         try {
             const { userId } = req.token
 
-            const thresholds = await thresholdModel.find({ userId })
+            const thresholds = await thresholdModel.find({ userId, deleted: false })
             res.send({ obj: thresholds })
 
         } catch (error) { res.status(500).send(error.toString()) }

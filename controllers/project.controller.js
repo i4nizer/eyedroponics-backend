@@ -41,7 +41,7 @@ const projectController = {
             const threshold = new thresholdModel({ projectId: project._id, userId })
             await threshold.save()
 
-            res.send({ txt: 'New project created', obj: project })
+            res.send({ txt: 'New project created', obj: { project, threshold } })
 
         } catch (error) { res.status(500).send(error.toString()) }
     },
@@ -64,9 +64,13 @@ const projectController = {
         try {
             const { userId } = req.token
             const { projectId } = req.params
-            
+
+            // Mark as deleted
             const project = await projectModel.findOneAndUpdate({ _id: projectId, userId, deleted: false }, { deleted: true }, { new: true })
             if (!project) return res.status(404).send('Project not found')
+            
+            // As well as its threshold
+            await thresholdModel.updateOne({ projectId: project._id }, { deleted: true })
             
             res.send({ txt: 'Project deleted' })
             

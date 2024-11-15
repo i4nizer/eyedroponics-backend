@@ -1,6 +1,6 @@
-const deviceModel = require('../models/device.model')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
+const deviceModel = require('../models/device.model')
 
 
 const deviceController = {
@@ -44,7 +44,7 @@ const deviceController = {
             const device = new deviceModel(deviceDoc)
             
             // create api key
-            const payload = { projectId, deviceId: device._id }
+            const payload = { userId, projectId, deviceId: device._id }
             device.key = jwt.sign(payload, config.apiKey)
             await device.save()
 
