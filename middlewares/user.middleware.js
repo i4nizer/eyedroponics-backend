@@ -1,5 +1,3 @@
-const jwt = require('jsonwebtoken')
-const config = require('../config/config')
 const validate = require("@i4nizer/obj-validator")
 
 
@@ -40,29 +38,6 @@ const userMiddleware = {
         
         req.user = result
         next()
-    },
-
-    /** Requires authorization in req.headers */
-    validateAccessToken: (req, res, next) => {
-        try {
-            const token = req.headers['authorization']?.split(' ')[1]
-            if (!token) return res.status(400).send('No token provided')
-            
-            const payload = jwt.verify(token, config.accessKey)
-            req.token = payload
-            next()
-        } catch (error) { res.status(400).send('Invalid or expired token') }
-    },
-    
-    /** Requires token in req.body */
-    validateRefreshToken: (req, res, next) => {
-        try {
-            const token = req?.body.token
-            if (!token) return res.status(400).send('No token provided')
-            
-            jwt.verify(token, config.refreshKey)
-            next()
-        } catch (error) { res.status(400).send('Invalid or expired token') }
     },
 
 }

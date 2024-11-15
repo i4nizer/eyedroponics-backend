@@ -44,7 +44,7 @@ const deviceController = {
             const device = new deviceModel(deviceDoc)
             
             // create api key
-            const payload = { deviceId: device._id }
+            const payload = { projectId, deviceId: device._id }
             device.key = jwt.sign(payload, config.apiKey)
             await device.save()
 
